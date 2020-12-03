@@ -1,4 +1,4 @@
-# RC4_FoodBuddy
+RC4_FoodBuddy
 ===============
 *Fight isolation with food!*
 
@@ -7,6 +7,11 @@
       /  __/ /  / /  /  / /  /  / /   /  /_/  /  /  /  /  / /   /  / /   /\  \/  /
      /  /   /  /_/  /  /_/  /  /_/   /  /__\  \  \_/  /  /_/   /  /_/   /  \    /
     /__/    \______/\______/\_______/_________/\_____/ \______/ \______/   /___/
+ 
+ Work distribution:
+ * Frontend Input: Alvin
+ * Frontend Output: Xin Yu
+ * Backend: Bryan
  
 To clone repo:
 `git clone https://github.com/Uxinnn/RC4_FoodBuddy.git`
