@@ -1,10 +1,13 @@
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton, ParseMode
 from telegram.ext import Updater, CommandHandler, MessageHandler, ConversationHandler, Filters
+import datefinder
+from datetime import datetime
 import random
+from typing import List
 
 class Event:
     def __init__(self, name, handle, time_slot, food_place, quota, current_size):
-    	self.name = name
+        self.name = name
         self.handle = handle
         self.time_slot = time_slot
         self.food_place = food_place
@@ -12,17 +15,19 @@ class Event:
         self.current_size = current_size
 
     def __str__(self) -> str: #what you return is a string
-    	event_text = "-"
-    	event_text += self.time_slot
-    	event_text += " "
+        event_text = "-"
+        event_text += self.time_slot
+        event_text += " "
         #return some string
-
 
 
 events_list = []
 
+def sort_function(event_instance):
+    return event_instance.time_slot
+
 class ChannelEntry:
-  def __init__(self, msg: Message, day: str, events: Set[Event]) -> None:
+  def __init__(self, msg: Message, day: str, events: List[Event]) -> None:
     self.msg = msg
     self.day = day
     self.events = events
@@ -34,6 +39,15 @@ class ChannelEntry:
       txt += str(event)
       txt += "\n"
     return txt
+
+  def add_to_channel(self, event_instance):
+    events.append(event_instance)
+    events.sort(key=sort_function)
+
+  def remove_from_channel(self, event):
+    for 
+
+
 
 
 
@@ -48,7 +62,11 @@ def daily_update(events_array):
     for i in range(len(events_array)-1):
         events_array[i] = events_array[i+1]
     event_update(events_array)
+
     
+def check_date_valid(msg):
+    match = list(datefinder.find_dates(msg))
+    return bool(match)
 
 
 
