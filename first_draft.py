@@ -1,25 +1,22 @@
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton, ParseMode
 from telegram.ext import Updater, CommandHandler, MessageHandler, ConversationHandler, Filters
 import datefinder
-from datetime import datetime
+import datetime
+import pytz
 import random
 from typing import List
 
+time_zone = pytz.timezone("Asia/Singapore")
+
 class Event:
-    def __init__(self, name, handle, time_slot, food_place, quota, current_size):
-        self.name = name
-        self.handle = handle
-        self.time_slot = time_slot
-        self.food_place = food_place
-        self.quota = quota
-        self.current_size = current_size
+    def __init__(self, name, handle, day, time_slot, food_place):
+        self.name = name #name of event
+        self.handle = handle #handle of organizer
+        self.day = day #day of event (mon/tues/wed etc)
+        self.time_slot = time_slot #start time
+        self.food_place = food_place #place of event
 
-    def __str__(self) -> str: #what you return is a string
-        event_text = "-"
-        event_text += self.time_slot
-        event_text += " "
-        #return some string
-
+day_dict = {"Monday":0, "Tuesday":1, "Wednesday":2, "Thursday":3, "Friday":4, "Saturday":5, "Sunday":6}
 
 events_list = []
 
@@ -41,15 +38,23 @@ class ChannelEntry:
     return txt
 
   def add_to_channel(self, event_instance):
-    events.append(event_instance)
-    events.sort(key=sort_function)
+    now = datetime.datetime.now()
+    time_now = time_zone.localize(now)
+    index = (day_dict[event_instance.day] - today) % 7
 
-  def remove_from_channel(self, event):
-    for i
+    events_list[index].append(event_instance)
+    events_list[index].sort(key=sort_function)
 
+ #  def remove_from_channel(self, event_instance):
+ #      now = datetime.datetime.now()
+    # time_now = time_zone.localize(now)
+ #      index = (day_dict[event_instance.day] - today) % 7
 
+ #      for i in events_list[index]:
+ #          if (i.handle == event_instance.handle && i.)
 
-
+ #      events_list[index].append(event_instance)
+ #      events_list[index].sort(key=sort_function)
 
 def event_update(events_array):
     master_string = ""
@@ -60,15 +65,8 @@ def event_update(events_array):
 
 def daily_update(events_array):
     for i in range(len(events_array)-1):
-        events_array[i] = events_array[i+1]
-    event_update(events_array)
-
-    
-def check_date_valid(msg):
-    match = list(datefinder.find_dates(msg))
-    return bool(match)
-
-
+       events_array[i] = events_array[I+1]
+    events_array[6] = ChannelEntry([])
 
 
 def main():
