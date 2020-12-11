@@ -45,7 +45,7 @@ class ChannelEntry:
     events.sort(key=sort_function)
 
   def remove_from_channel(self, event):
-    for 
+    for i
 
 
 
