@@ -11,7 +11,7 @@ RC4_FoodBuddy
  Work distribution:
  * Frontend Input: Alvin
  * Frontend Output: Xin Yu
- * Backend: Bryan
+ * Backend: Bryan, Mukund
  
 To clone repo:
 `git clone https://github.com/Uxinnn/RC4_FoodBuddy.git`

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from telegram import ParseMode, Message
 from telegram.ext import Updater, CommandHandler
 from telegram.ext.callbackcontext import CallbackContext
@@ -7,17 +5,10 @@ from telegram.update import Update
 from datetime import datetime, timedelta, time
 import logging
 from typing import Set, Union
+from main import Event
 
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-
-
-class Event:
-  def __init__(self):
-    ...
-
-  def __str__(self):
-    ...
 
 
 class ChannelEntry:
