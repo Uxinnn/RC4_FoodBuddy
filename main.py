@@ -1,3 +1,4 @@
+import emoji
 import logging
 from typing import Dict, Union
 import datetime
@@ -13,18 +14,18 @@ logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=lo
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
-DAY_DICT = {"mon": 0, "tues": 1, "wed": 2, "thurs": 3, "fri": 4, "sat": 5, "sun": 6}
+DAY_DICT = {"Monday": 0, "Tuesday": 1, "Wednesday": 2, "Thursday": 3, "Friday": 4, "Saturday": 5, "Sunday": 6}
 
 COUNT = 0
 CHANNEL = []
 MESSAGES = []
 
-CHANNEL_HANDLE = "@test_channel1233"
-CHANNEL_URL = "https://t.me/test_channel1233"
-BOT_TOKEN = "insert token here"
+CHANNEL_HANDLE = "@fodisnumberone"
+CHANNEL_URL = "https://t.me/fodisnumberone"
+BOT_TOKEN = "1414408039:AAFF_XI0DM1gINiPWcoBkxQnhQGteL-vomM"
 
 # Stages
-START, DAYS, TIME, PAX, REMARKS = range(5)
+START, MENU, DELETE, ORIGIN, DAYS, TIME, PAX, REMARKS, END = range(9)
 
 
 ####################################
@@ -90,35 +91,51 @@ def print_channel() -> None:
 #######
 # Bot #
 #######
-def start(update: Update, context: CallbackContext) -> int:
+def start(update: Update, context: CallbackContext) -> None:
+
+    keyboard = [
+        [   InlineKeyboardButton("Main Menu", callback_data="menu")],
+
+        ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
+    user = update.message.from_user
+
+    context.user_data['username'] = user.username  # Changed from first and last name to username
+    logger.info(f"User {user.first_name} started the conversation.")
+
+    logger.info("User %s started the conversation.", user.first_name)
+
+    # Send message with text and appended InlineKeyboard
+    update.message.reply_text(text="*Looking for a meal buddy?*", parse_mode='Markdown', reply_markup=reply_markup)
+    # Tell ConversationHandler that we're in state `FIRST` now
+    return START
+
+def menu(update: Update, context: CallbackContext) -> int:
     """Send message on `/start`."""
     # Get user that sent /start and log his name
     # Build InlineKeyboard where each button has a displayed text
     # and a string as callback_data
     # The keyboard is a list of button rows, where each row is in turn
     # a list (hence `[[...]]`).
+    query = update.callback_query
+    query.answer()
     keyboard = [
         [InlineKeyboardButton("✍ Create Meal Session", callback_data="create")],
         [InlineKeyboardButton("🤝Join Meal Session", callback_data="join")],
+        [InlineKeyboardButton("Delete", callback_data="delete")],
+        [InlineKeyboardButton("🙋‍♂️🙋Help",callback_data="help")],
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    try:
-        user = update.message.from_user
-    except AttributeError:
-        update.callback_query.edit_message_text(text="*What do you want to do 🤔 ?*",
-                                                parse_mode='Markdown',
-                                                reply_markup=reply_markup)
-        return START
 
-    context.user_data['username'] = user.username  # Changed from first and last name to username
-    logger.info(f"User {user.first_name} started the conversation.")
-    # Send message with text and appended InlineKeyboard
-    update.message.reply_text(text="*What do you want to do 🤔 ?*",
-                              parse_mode='Markdown',
-                              reply_markup=reply_markup)
-    # Tell ConversationHandler that we're in state `FIRST` now
-    return START
+
+    query.edit_message_text(text="*What do you want to do 🤔 ?*",
+                            parse_mode='Markdown',
+                            reply_markup=reply_markup)
+
+    return MENU
+
 
 
 def facts_to_str(user_data: Dict[str, str]) -> str:
@@ -169,6 +186,7 @@ def time(update: Update, context: CallbackContext) -> int:
 def pax(update: Update, context: CallbackContext) -> int:
     query = update.callback_query
     query.answer()
+    context.user_data['pax'] = query.data
     keyboard = [
         [InlineKeyboardButton("🔙Back", callback_data="back")],
         [InlineKeyboardButton("📃Main Menu", callback_data="main")],
@@ -180,19 +198,39 @@ def pax(update: Update, context: CallbackContext) -> int:
                             )
     return REMARKS
 
+def remarks(update: Update, context: CallbackContext) -> None:
+
+    text = update.effective_message.text
+
+    context.user_data['Remarks:'] = text
+    logger.debug(f"\t{context.user_data['username']} remarked {text}")
+
+    keyboard = [
+        [
+            InlineKeyboardButton("Confirm", callback_data="confirm")],
+        [   InlineKeyboardButton("📃Main Menu", callback_data="main")],
+        [   InlineKeyboardButton("🔙Back", callback_data="back")],
+
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
+    update.effective_message.reply_text(f'*Just to confirm your session details:{facts_to_str(context.user_data)}*',parse_mode='Markdown', reply_markup=reply_markup)
+
+    return END
+
 
 def create(update: Update, context: CallbackContext) -> int:
     """Show new choice of buttons"""
     query = update.callback_query
     query.answer()
     keyboard = [
-        [InlineKeyboardButton("Mon", callback_data="mon"),
-         InlineKeyboardButton("Tue", callback_data="tues"),
-         InlineKeyboardButton("Wed", callback_data="wed"),
-         InlineKeyboardButton("Thurs", callback_data="thurs"),
-         InlineKeyboardButton("Fri", callback_data="fri"),
-         InlineKeyboardButton("Sat", callback_data="sat"),
-         InlineKeyboardButton("Sun", callback_data="sun")],
+        [InlineKeyboardButton("Mon", callback_data="Monday"),
+         InlineKeyboardButton("Tue", callback_data="Tuesday"),
+         InlineKeyboardButton("Wed", callback_data="Wednesday"),
+         InlineKeyboardButton("Thurs", callback_data="Thursday"),
+         InlineKeyboardButton("Fri", callback_data="Friday"),
+         InlineKeyboardButton("Sat", callback_data="Saturday"),
+         InlineKeyboardButton("Sun", callback_data="Sunday")],
         [InlineKeyboardButton("📃Main Menu", callback_data="main")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -219,30 +257,77 @@ def join(update: Update, context: CallbackContext) -> int:
                             )
     return DAYS
 
+def delete(update: Update, context: CallbackContext) -> None:
+    query = update.callback_query
+    query.answer()
+    keyboard = [
+        [InlineKeyboardButton("Delete active meal sessions", callback_data="dams")],
+        [InlineKeyboardButton("🔙Back", callback_data="back")],
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    query.edit_message_text(
+        text="*Are you sure you want to delete your meal session?*",parse_mode= 'Markdown', reply_markup=reply_markup
+    )
+
+    return DELETE
+
+def clear(update: Update, context: CallbackContext) -> None:
+    query = update.callback_query
+    query.answer()
+    event = Event(COUNT,
+                  update.effective_message.from_user["username"],
+                  context.user_data["days"],
+                  context.user_data["time"],
+                  context.user_data["pax"],
+                  context.user_data["Remarks:"])
+    del event
+
+    keyboard = [
+        [InlineKeyboardButton("📃Main Menu", callback_data="main")],
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    query.edit_message_text(
+        text="*Session deleted*",parse_mode= 'Markdown', reply_markup=reply_markup
+    )
+
+    return ORIGIN
+
+def help(update: Update, context: CallbackContext) -> None:
+    """Show new choice of buttons"""
+    query = update.callback_query
+    query.answer()
+    keyboard = [
+        [InlineKeyboardButton("📃Main Menu", callback_data="main")],
+
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    query.edit_message_text(
+        text="*To find an existing session; click on join meal session at the main menu. To create a new session; click on create meal session at the main menu and input the neccessary details accordingly*",parse_mode= 'Markdown', reply_markup=reply_markup
+    )
+
+    return DAYS
 
 def end(update: Update, context: CallbackContext) -> int:
     """Returns `ConversationHandler.END`, which tells the
     ConversationHandler that the conversation is over"""
     global COUNT
+    query = update.callback_query
     text = update.effective_message.text
     context.user_data['choice'] = text
-    logger.debug(f"\t{context.user_data['username']} remarked {text}")
-    keyboard = [
-        [InlineKeyboardButton("🔙Back", callback_data="back")],
-        [InlineKeyboardButton("📃Main Menu", callback_data="main")],
-    ]
-    reply_markup = InlineKeyboardMarkup(keyboard)
-    update.effective_message.reply_text('*Thank you for hosting a session!*',
+    logger.debug(f"\t{context.user_data['username']} has just {text}")
+
+    query.edit_message_text('*Thank you for hosting a session!*',
                                         parse_mode='Markdown',
-                                        reply_markup=reply_markup
                                         )
 
     # Add event to CHANNEL
     event = Event(COUNT,
-                  update.message.from_user["username"],
+                  context.user_data['username'],
                   context.user_data["days"],
                   context.user_data["time"],
-                  "food place")
+                  context.user_data["pax"],
+                  context.user_data["Remarks:"])
+
     COUNT += 1
     add_to_channel(event, context)
 
@@ -251,7 +336,7 @@ def end(update: Update, context: CallbackContext) -> int:
 
 def main():
     # Create the Updater and pass it your bot's token.
-    updater = Updater(BOT_TOKEN, use_context=True)
+    updater = Updater("1414408039:AAFF_XI0DM1gINiPWcoBkxQnhQGteL-vomM", use_context=True)
     init_channel(updater)
 
     # Get the dispatcher to register handlers
@@ -267,24 +352,37 @@ def main():
         entry_points=[CommandHandler('start', start)],
         states={
             START: [
+                CallbackQueryHandler(menu, pattern='^menu$'),
+            ],
+            MENU: [
                 CallbackQueryHandler(create, pattern='^create$'),
-                # MessageHandler(Filters.text & ~(Filters.command | Filters.regex('^Done$')), received_time),
-                CallbackQueryHandler(join, pattern='^join$')
+                #MessageHandler(Filters.text & ~(Filters.command | Filters.regex('^Done$')), received_time),
+                CallbackQueryHandler(join, pattern='^join$'),
+                CallbackQueryHandler(delete, pattern='^delete$'),
+                CallbackQueryHandler(help, pattern='^help$'),
+            ],
+            DELETE: [
+                CallbackQueryHandler(clear, pattern='^dams$'),
+                CallbackQueryHandler(menu, pattern='^back$'),
+                CallbackQueryHandler(menu, pattern='^main$')
+            ],
+            ORIGIN: [
+                CallbackQueryHandler(menu, pattern='^main$')
             ],
             DAYS: [
-                CallbackQueryHandler(days, pattern='^mon$'),
-                CallbackQueryHandler(days, pattern='^tues$'),
-                CallbackQueryHandler(days, pattern='^wed$'),
-                CallbackQueryHandler(days, pattern='^thurs$'),
-                CallbackQueryHandler(days, pattern='^fri$'),
-                CallbackQueryHandler(days, pattern='^sat$'),
-                CallbackQueryHandler(days, pattern='^sun$'),
-                CallbackQueryHandler(start, pattern='^main$')
+                CallbackQueryHandler(days, pattern='^Monday$'),
+                CallbackQueryHandler(days, pattern='^Tuesday$'),
+                CallbackQueryHandler(days, pattern='^Wednesday$'),
+                CallbackQueryHandler(days, pattern='^Thursday$'),
+                CallbackQueryHandler(days, pattern='^Friday$'),
+                CallbackQueryHandler(days, pattern='^Saturday$'),
+                CallbackQueryHandler(days, pattern='^Sunday$'),
+                CallbackQueryHandler(menu, pattern='^main$')
             ],
             TIME: [
                 MessageHandler(Filters.text & ~Filters.command, time),
                 CallbackQueryHandler(create, pattern='^back$'),
-                CallbackQueryHandler(start, pattern='^main$')
+                CallbackQueryHandler(menu, pattern='^main$')
             ],
             PAX: [
                 CallbackQueryHandler(pax, pattern='^2$'),
@@ -292,10 +390,17 @@ def main():
                 CallbackQueryHandler(pax, pattern='^4$'),
                 CallbackQueryHandler(pax, pattern='^5$'),
                 CallbackQueryHandler(days, pattern='^back$'),
-                CallbackQueryHandler(start, pattern='^main$'),
+                CallbackQueryHandler(menu, pattern='^main$'),
             ],
             REMARKS: [
-                MessageHandler(Filters.text & ~(Filters.command | Filters.regex('^Done$')), end)
+                MessageHandler(Filters.text & ~(Filters.command | Filters.regex('^Done$')), remarks),
+                CallbackQueryHandler(time, pattern='^back$'),
+                CallbackQueryHandler(start, pattern='^main$'),
+            ],
+            END: [
+                CallbackQueryHandler(end, pattern='^confirm$'),
+                CallbackQueryHandler(pax, pattern='^back$'),
+                CallbackQueryHandler(start, pattern='^main$'),
             ]
         },
         fallbacks=[CommandHandler('start', start)],
