@@ -2,16 +2,20 @@ from typing import List
 
 
 class Event:
-    def __init__(self, id: int, handle: str, day: str, time_slot: str, food_place: str) -> None:
+    def __init__(self, id: int, handle: str, day: str, time_slot: str, pax:str, food_place: str) -> None:
         self.id = id  # id of event
         self.handle = handle  # handle of organizer
         self.day = day  # day of event (mon/tues/wed etc)
         self.time_slot = time_slot  # start time
+        self.pax = pax
         self.food_place = food_place  # place of event
+
 
     def __str__(self) -> str:
         txt = f"Index {self.id}: @{self.handle}\n" \
-              f"\t\t• {self.time_slot} {self.food_place}"
+              f"Time: {self.time_slot}\n "\
+              f"Maximum number of people: {self.pax}\n "\
+              f"Remarks: {self.food_place}"
         return txt
 
 
