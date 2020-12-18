@@ -2,7 +2,7 @@ from typing import List
 
 
 class Event:
-    def __init__(self, id: int, handle: str, day: str, time_slot: str, pax:str, food_place: str) -> None:
+    def __init__(self, id: int, handle: str, day: str, time_slot: str, pax: str, food_place: str) -> None:
         self.id = id  # id of event
         self.handle = handle  # handle of organizer
         self.day = day  # day of event (mon/tues/wed etc)
@@ -10,12 +10,11 @@ class Event:
         self.pax = pax
         self.food_place = food_place  # place of event
 
-
     def __str__(self) -> str:
         txt = f"Index {self.id}: @{self.handle}\n" \
-              f"Time: {self.time_slot}\n "\
-              f"Maximum number of people: {self.pax}\n "\
-              f"Remarks: {self.food_place}"
+              f"\t\tTime: {self.time_slot}\n"\
+              f"\t\tMax people: {self.pax}\n"\
+              f"\t\tRemarks: {self.food_place}"
         return txt
 
 
@@ -37,3 +36,20 @@ class ChannelEntry:
     def add_event(self, event):
         self.events.append(event)
         self.sort_events()
+
+    def get_user_events(self, user):
+        return [event for event in self.events if event.handle == user]
+
+    def check_event_id(self, id):
+        return id in [event.id for event in self.events]
+
+    def del_event(self, id):
+        if not self.check_event_id(id):
+            return False
+        idx = 0
+        for i in range(len(self.events)):
+            if self.events[i].id == id:
+                idx = i
+                break
+        del self.events[idx]
+        return True
