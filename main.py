@@ -75,32 +75,16 @@ def add_to_channel(event: Event, context: CallbackContext) -> None:
 
 # Returns index of channel entry in CHANNEL with entry of input id
 def get_channel_index(id: int) -> int:
-    for i in range(len(CHANNEL)):
-        if CHANNEL[i].check_event_id(id):
-            return i
-    return -1
-
+    ...
 
 # Deletes event with input id from channel
 def del_from_channel(id: int, context: CallbackContext) -> bool:
-    channel_idx = get_channel_index(id)
-    ret = CHANNEL[channel_idx].del_event(id)
-    msg = MESSAGES[channel_idx]
-    print(ret)
-    logger.debug(f"Deleting index {id} event...")
-    context.bot.edit_message_text(chat_id=msg.chat_id,
-                                  message_id=msg.message_id,
-                                  text=str(CHANNEL[channel_idx]),
-                                  parse_mode=ParseMode.HTML)
+    ...
 
-    return ret
 
 # Get events associated with input user handle
 def get_user_events(user: str) -> List[Event]:
-    user_events = []
-    for entry in CHANNEL:
-        user_events.extend(entry.get_user_events(user))
-    return user_events
+    ...
 
 
 # Updates channel everyday
