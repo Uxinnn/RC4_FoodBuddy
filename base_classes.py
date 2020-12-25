@@ -39,12 +39,20 @@ class ChannelEntry:
 
     # Get events associated with input user
     def get_user_events(self, user):
-        ...
+        return [event for event in self.events if event.handle == user]
 
     # Check if input id is the id of one of the events in the object
     def check_event_id(self, id):
-        ...
+        return id in [event.id for event in self.events]
 
     # delete event from object
     def del_event(self, id):
-        ...
+        if not self.check_event_id(id):
+            return False
+        idx = 0
+        for i in range(len(self.events)):
+            if self.events[i].id == id:
+                idx = i
+                break
+        del self.events[idx]
+        return True

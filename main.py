@@ -21,9 +21,9 @@ COUNT = 0
 CHANNEL = []
 MESSAGES = []
 
-CHANNEL_HANDLE = "@fodisnumberone"
-CHANNEL_URL = "https://t.me/fodisnumberone"
-BOT_TOKEN = "1414408039:AAFF_XI0DM1gINiPWcoBkxQnhQGteL-vomM"
+CHANNEL_HANDLE = "@test_channel1233"
+CHANNEL_URL = "https://t.me/test_channel1233"
+BOT_TOKEN = "1424694577:AAHm2GzdSee-WHyIj-tYn6zTf8TTCbuYKE4"
 
 # Stages of conversation
 MENU, OPTIONS, DELETE, DAYS, TIME, PAX, REMARKS, CONFIRM, END, RESTART = range(10)
@@ -63,6 +63,7 @@ def update_channel(context: Union[CallbackContext, Updater]) -> None:
 
 # Adds a new entry to the channel
 def add_to_channel(event: Event, context: CallbackContext) -> None:
+    print(str(event))
     idx = (DAY_DICT[event.day] - datetime.datetime.today().weekday()) % 7
     CHANNEL[idx].add_event(event)
     msg = MESSAGES[idx]
@@ -75,16 +76,32 @@ def add_to_channel(event: Event, context: CallbackContext) -> None:
 
 # Returns index of channel entry in CHANNEL with entry of input id
 def get_channel_index(id: int) -> int:
-    ...
+    for i in range(len(CHANNEL)):
+        if CHANNEL[i].check_event_id(id):
+            return i
+    return -1
+
 
 # Deletes event with input id from channel
 def del_from_channel(id: int, context: CallbackContext) -> bool:
-    ...
+    channel_idx = get_channel_index(id)
+    ret = CHANNEL[channel_idx].del_event(id)
+    msg = MESSAGES[channel_idx]
+    print(ret)
+    logger.debug(f"Deleting index {id} event...")
+    context.bot.edit_message_text(chat_id=msg.chat_id,
+                                  message_id=msg.message_id,
+                                  text=str(CHANNEL[channel_idx]),
+                                  parse_mode=ParseMode.HTML)
+    return ret
 
 
 # Get events associated with input user handle
 def get_user_events(user: str) -> List[Event]:
-    ...
+    user_events = []
+    for entry in CHANNEL:
+        user_events.extend(entry.get_user_events(user))
+    return user_events
 
 
 # Updates channel everyday
@@ -186,11 +203,13 @@ def days(update: Update, context: CallbackContext) -> int:
                             )
     return TIME
 
+
 # User to input the time of the meal session after selecting the day
 def time(update: Update, context: CallbackContext) -> int:
     query = update.callback_query
     query.answer()
-    context.user_data['Day:'] = query.data
+    if not query.data == "back":
+        context.user_data['Day:'] = query.data
     logger.debug(f"\t{context.user_data['Telegram Handle:']} chose {query.data}")
     keyboard = [
         [InlineKeyboardButton("📃Main Menu", callback_data="main")],
@@ -225,11 +244,13 @@ def pax(update: Update, context: CallbackContext) -> int:
                                         )
     return REMARKS
 
+
 # User to input other remarks after selecting max number of pax
 def remarks(update: Update, context: CallbackContext) -> int:
     query = update.callback_query
     query.answer()
-    context.user_data['Pax:'] = query.data
+    if not query.data == "back":
+        context.user_data['Pax:'] = query.data
     keyboard = [
         [InlineKeyboardButton("🔙Back", callback_data="back")],
         [InlineKeyboardButton("📃Main Menu", callback_data="main")],
@@ -262,12 +283,13 @@ def confirm(update: Update, context: CallbackContext) -> None:
 
     return END
 
+
 # Bot sends session details to channel after confirmation
 def end(update: Update, context: CallbackContext) -> int:
     global COUNT
     query = update.callback_query
     text = update.effective_message.text
-    context.user_data['choice'] = text
+    # context.user_data['choice'] = text
     logger.debug(f"\t{context.user_data['Telegram Handle:']} has just confirmed the following details:{text}")
     # Add event to CHANNEL
     event = Event(COUNT,
@@ -290,14 +312,12 @@ def end(update: Update, context: CallbackContext) -> int:
                             parse_mode='Markdown',
                             reply_markup=reply_markup
                             )
-
-
     return RESTART
+
 
 ############################
 # JOINING SESSION SEQUENCE #
 ############################
-
 def join(update: Update, context: CallbackContext) -> int:
     """Show new choice of buttons"""
     query = update.callback_query
@@ -314,16 +334,19 @@ def join(update: Update, context: CallbackContext) -> int:
                             )
     return MENU
 
+
 #############################
 # DELETING SESSION SEQUENCE #
 #############################
-
 def delete(update: Update, context: CallbackContext) -> None:
     query = update.callback_query
     query.answer()
 
-    #Backend function that lists user's events to be inserted here
-
+    user = context.user_data["username"]
+    user_events = get_user_events(user)
+    event_str = ""
+    for event in user_events:
+        event_str += (str(event) + "\n")
 
     keyboard = [
         [InlineKeyboardButton("1st Session", callback_data="I0")],
@@ -334,13 +357,12 @@ def delete(update: Update, context: CallbackContext) -> None:
         ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     query.edit_message_text(
-    text=f"*Which of the following sessions do you want to delete? \n {event_str}*",
-    parse_mode='Markdown',
-    reply_markup=reply_markup
+        text=f"*Which of the following sessions do you want to delete? \n {event_str}*",
+        parse_mode='Markdown',
+        reply_markup=reply_markup
     )
-
-
     return DELETE
+
 
 # Deletes first session created by user
 def clear0(update: Update, context: CallbackContext) -> None:
@@ -360,6 +382,8 @@ def clear0(update: Update, context: CallbackContext) -> None:
     )
 
     return RESTART
+
+
 # Deletes second session created by user
 def clear1(update: Update, context: CallbackContext) -> None:
     query = update.callback_query
@@ -378,6 +402,7 @@ def clear1(update: Update, context: CallbackContext) -> None:
     )
 
     return RESTART
+
 
 # Deletes third session created by user
 def clear2(update: Update, context: CallbackContext) -> None:
@@ -398,6 +423,7 @@ def clear2(update: Update, context: CallbackContext) -> None:
 
     return RESTART
 
+
 # Deletes fourth session created by user
 def clear3(update: Update, context: CallbackContext) -> None:
     query = update.callback_query
@@ -416,6 +442,7 @@ def clear3(update: Update, context: CallbackContext) -> None:
     )
 
     return RESTART
+
 
 # Help message to guide user in using the bot
 def help(update: Update, context: CallbackContext) -> None:
