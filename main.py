@@ -28,6 +28,9 @@ BOT_TOKEN = "<INSERT TOKEN HERE>"
 # Stages of conversation
 MENU, OPTIONS, DELETE, DAYS, TIME, PAX, REMARKS, CONFIRM, END, RESTART = range(10)
 
+TIME_ZONE = pytz.timezone("Asia/Singapore")
+DAILY_UPDATE_TIME = datetime.time(hour=0, minute=0, second=0, tzinfo = TIME_ZONE)
+
 
 ####################################
 # Functions to interact with store #
@@ -477,7 +480,7 @@ def main():
     dispatcher.add_handler(conv_handler)
 
     # Initialise daily update
-    updater.job_queue.run_daily(daily_update, datetime.time(2, 3, 00))  # To check again
+    updater.job_queue.run_daily(daily_update, DAILY_UPDATE_TIME)
     updater.job_queue.start()
     logger.debug(f"Daily updates schedule: {updater.job_queue.jobs()[0].next_t}")
     # updater.job_queue.jobs()[0].run(dispatcher)
