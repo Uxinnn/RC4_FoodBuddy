@@ -21,9 +21,9 @@ COUNT = 0
 CHANNEL = []
 MESSAGES = []
 
-CHANNEL_HANDLE = "@fodisnumberone"
-CHANNEL_URL = "https://t.me/fodisnumberone"
-BOT_TOKEN = "1414408039:AAFF_XI0DM1gINiPWcoBkxQnhQGteL-vomM"
+CHANNEL_HANDLE = "@test_channel1233"
+CHANNEL_URL = "https://t.me/test_channel1233"
+BOT_TOKEN = "<INSERT TOKEN HERE>"
 
 # Stages of conversation
 MENU, OPTIONS, DELETE, DAYS, TIME, PAX, REMARKS, CONFIRM, END, RESTART = range(10)
@@ -32,6 +32,8 @@ MENU, OPTIONS, DELETE, DAYS, TIME, PAX, REMARKS, CONFIRM, END, RESTART = range(1
 ####################################
 # Functions to interact with store #
 ####################################
+
+# Initializes CHANNEL and MESSAGES
 def init_channel(updater: Updater) -> None:
     logger.debug("Initializing channel...")
 
@@ -39,7 +41,9 @@ def init_channel(updater: Updater) -> None:
     while len(CHANNEL) != 7:
         day = date.strftime('%A')
         logging.debug(f"\tCreating entry for {day}...")
-        msg = updater.bot.send_message(text=f"<b>{day}</b>\n", chat_id=CHANNEL_HANDLE, parse_mode=ParseMode.HTML)
+        msg = updater.bot.send_message(text=f"<b>{day}</b>\n",
+                                       chat_id=CHANNEL_HANDLE,
+                                       parse_mode=ParseMode.HTML)
         CHANNEL.append(ChannelEntry(day, []))
         MESSAGES.append(msg)
         date += datetime.timedelta(days=1)
@@ -92,8 +96,8 @@ def del_from_channel(id: int, context: CallbackContext) -> bool:
                                   message_id=msg.message_id,
                                   text=str(CHANNEL[channel_idx]),
                                   parse_mode=ParseMode.HTML)
-
     return ret
+
 
 # Get events associated with input user handle
 def get_user_events(user: str) -> List[Event]:
@@ -109,7 +113,7 @@ def daily_update(callback: CallbackContext) -> None:
     channel_copy = CHANNEL.copy()
     day = (datetime.datetime.now() - datetime.timedelta(days=1)).strftime('%A')
     for i in range(len(CHANNEL)-1):
-       CHANNEL[i] = channel_copy[i+1]
+        CHANNEL[i] = channel_copy[i+1]
     CHANNEL[6] = ChannelEntry(day, [])
     update_channel(callback)
     print_channel()
@@ -129,7 +133,6 @@ def print_channel() -> None:
 
 # First function when users types in /start & logs users' telegram handle
 def start(update: Update, context: CallbackContext) -> None:
-
     keyboard = [
         [InlineKeyboardButton("Yes! Lets Go!", callback_data="main")],
         ]
@@ -137,17 +140,15 @@ def start(update: Update, context: CallbackContext) -> None:
 
     user = update.message.from_user
     context.user_data["Name"] = user.full_name
-    context.user_data['Telegram Handle:'] = user.username  # Changed from first and last name to username
+    context.user_data["Telegram Handle"] = user.username  # Changed from first and last name to username
     logger.info(f"User {user.first_name} started the conversation.")
-
-    logger.info("User %s started the conversation.", user.first_name)
 
     update.message.reply_text(text="*Looking for meal buddies?🙆‍♂️🙆‍♀️*",
                               parse_mode='Markdown',
                               reply_markup=reply_markup
                               )
-
     return MENU
+
 
 def menu(update: Update, context: CallbackContext) -> int:
     """Send message on `/start`."""
@@ -165,8 +166,8 @@ def menu(update: Update, context: CallbackContext) -> int:
                             parse_mode="Markdown",
                             reply_markup=reply_markup
                             )
-
     return OPTIONS
+
 
 # Allows logged user_data to be printed as string
 def facts_to_str(user_data: Dict[str, str]) -> str:
@@ -175,6 +176,7 @@ def facts_to_str(user_data: Dict[str, str]) -> str:
         facts.append(f'{key} - {value}')
 
     return "\n".join(facts).join(['\n', '\n'])
+
 
 ###########################
 # CREATE SESSION SEQUENCE #
@@ -202,12 +204,13 @@ def days(update: Update, context: CallbackContext) -> int:
                             )
     return TIME
 
+
 # User to input the time of the meal session after selecting the day
 def time(update: Update, context: CallbackContext) -> int:
     query = update.callback_query
     query.answer()
-    context.user_data['Day:'] = query.data
-    logger.debug(f"\t{context.user_data['Telegram Handle:']} chose {query.data}")
+    context.user_data['Day'] = query.data
+    logger.debug(f"\t{context.user_data['Telegram Handle']} chose {query.data}")
     keyboard = [
         [InlineKeyboardButton("📃Main Menu", callback_data="main")],
         [InlineKeyboardButton("🔙Back", callback_data="back")],
@@ -219,11 +222,12 @@ def time(update: Update, context: CallbackContext) -> int:
                             )
     return PAX
 
+
 # User to select maximum numer of pax after inputing time
 def pax(update: Update, context: CallbackContext) -> int:
     text = update.effective_message.text
-    context.user_data['Time:'] = text
-    logger.debug(f"\t{context.user_data['Telegram Handle:']} chose {text}")
+    context.user_data['Time'] = text
+    logger.debug(f"\t{context.user_data['Telegram Handle']} chose {text}")
     keyboard = [
         [InlineKeyboardButton("2", callback_data="2"),
          InlineKeyboardButton("3", callback_data="3"),
@@ -241,11 +245,12 @@ def pax(update: Update, context: CallbackContext) -> int:
                                         )
     return REMARKS
 
+
 # User to input other remarks after selecting max number of pax
 def remarks(update: Update, context: CallbackContext) -> int:
     query = update.callback_query
     query.answer()
-    context.user_data['Pax:'] = query.data
+    context.user_data['Pax'] = query.data
     keyboard = [
         [InlineKeyboardButton("🔙Back", callback_data="back")],
         [InlineKeyboardButton("📃Main Menu", callback_data="main")],
@@ -257,11 +262,12 @@ def remarks(update: Update, context: CallbackContext) -> int:
                             )
     return CONFIRM
 
+
 # User to confirm session details before the bot sends to channel
 def confirm(update: Update, context: CallbackContext) -> None:
     text = update.effective_message.text
-    context.user_data['Remarks:'] = text
-    logger.debug(f"\t{context.user_data['Telegram Handle:']} remarked {text}")
+    context.user_data['Remarks'] = text
+    logger.debug(f"\t{context.user_data['Telegram Handle']} remarked {text}")
 
     keyboard = [
         [InlineKeyboardButton("✔Confirm", callback_data="confirm")],
@@ -274,28 +280,26 @@ def confirm(update: Update, context: CallbackContext) -> None:
                                         parse_mode="Markdown",
                                         reply_markup=reply_markup
                                         )
-
     return END
+
 
 # Bot sends session details to channel after confirmation
 def end(update: Update, context: CallbackContext) -> int:
     global COUNT
     query = update.callback_query
     text = update.effective_message.text
-    logger.debug(f"\t{context.user_data['Telegram Handle:']} has just confirmed the following details:{text}")
-    # Add event to CHANNEL
+    logger.debug(f"\t{context.user_data['Telegram Handle']} has just confirmed the following details:\n{text}")
 
+    # Add event to CHANNEL
     event = Event(COUNT,
                   context.user_data["Name"],
-                  context.user_data['Telegram Handle:'],
-                  context.user_data['Day:'],
-                  context.user_data['Time:'],
-                  context.user_data['Pax:'],
-                  context.user_data['Remarks:'])
-
+                  context.user_data["Telegram Handle"],
+                  context.user_data["Day"],
+                  context.user_data["Time"],
+                  context.user_data["Pax"],
+                  context.user_data["Remarks"])
     COUNT += 1
     add_to_channel(event, context)
-
 
     keyboard = [
             [InlineKeyboardButton("📃Main Menu", callback_data="main")],
@@ -306,9 +310,8 @@ def end(update: Update, context: CallbackContext) -> int:
                             parse_mode='Markdown',
                             reply_markup=reply_markup
                             )
-
-
     return RESTART
+
 
 ############################
 # JOINING SESSION SEQUENCE #
@@ -318,7 +321,7 @@ def join(update: Update, context: CallbackContext) -> int:
     """Show new choice of buttons"""
     query = update.callback_query
     query.answer()
-    logger.debug(f"\t{context.user_data['Telegram Handle:']} wants to join a session")
+    logger.debug(f"\t{context.user_data['Telegram Handle']} wants to join a session")
     keyboard = [
         [InlineKeyboardButton("🧐Browse active sessions", url=CHANNEL_URL)],
         [InlineKeyboardButton("📃Main Menu", callback_data="main")],
@@ -330,6 +333,7 @@ def join(update: Update, context: CallbackContext) -> int:
                             )
     return MENU
 
+
 #############################
 # DELETING SESSION SEQUENCE #
 #############################
@@ -337,44 +341,33 @@ def join(update: Update, context: CallbackContext) -> int:
 def delete(update: Update, context: CallbackContext) -> None:
     query = update.callback_query
     query.answer()
-    user=context.user_data['Telegram Handle:']
+    user = context.user_data['Telegram Handle']
     user_events = get_user_events(user)
     event_str = ""
     for event in user_events:
-        print(str(event))
-        event_str += (str(event) + "\n")
+        event_str += (str(event) + "\n\n")
 
-    event = Event(COUNT,
-                  context.user_data["Name"],
-                  context.user_data['Telegram Handle:'],
-                  context.user_data['Day:'],
-                  context.user_data['Time:'],
-                  context.user_data['Pax:'],
-                  context.user_data['Remarks:'])
     keyboard = [
         [InlineKeyboardButton("🔙Back", callback_data="back")]
     ]
 
     reply_markup = InlineKeyboardMarkup(keyboard)
     query.edit_message_text(
-    text=f"*Which of the following sessions do you want to delete? \n {event_str} \n Please input the session id, for example: 2*",
-    parse_mode='Markdown',
-    reply_markup=reply_markup
+        text=f"*Which of the following sessions do you want to delete?\n"
+             f"{event_str}\n"
+             f"Please input the session id, E.g: 2*",
+        parse_mode='Markdown',
+        reply_markup=reply_markup
     )
-
-
     return DELETE
+
 
 # Deletes the session chosen by user
 def clear(update: Update, context: CallbackContext) -> None:
-    text=update.effective_message.text
-    context.user_data['id']= text
-    id=text
-
-    id = int(id)
-
+    text = update.effective_message.text
+    context.user_data['id'] = text
+    id = int(text)
     del_from_channel(id, context)
-
 
     keyboard = [
         [InlineKeyboardButton("📃Main Menu", callback_data="main")],
@@ -385,9 +378,10 @@ def clear(update: Update, context: CallbackContext) -> None:
         parse_mode='Markdown',
         reply_markup=reply_markup
     )
-
     del context.user_data['id']
+
     return RESTART
+
 
 # Help message to guide user in using the bot
 def help(update: Update, context: CallbackContext) -> None:
@@ -400,9 +394,9 @@ def help(update: Update, context: CallbackContext) -> None:
     reply_markup = InlineKeyboardMarkup(keyboard)
     query.edit_message_text(
         text="*To find an existing session:*\n\t\t"
-             "Click on join meal session at the main menu\n"
+             "Click on join meal session at the main menu.\n"
              "*To create a new session:*\n\t\t"
-             "Click on create meal session at the main menu and input the necessary details accordingly",
+             "Click on create meal session at the main menu and input the necessary details accordingly.",
         parse_mode="Markdown",
         reply_markup=reply_markup
     )
