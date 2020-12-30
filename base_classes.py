@@ -12,13 +12,12 @@ class Event:
         self.food_place = food_place  # place of event
 
     def __str__(self) -> str:
-        txt = f" \n"\
-              f"\t\t\t\t\t[Session {self.id}]\n"\
-              f"Name: {self.name}\n"\
-              f"Contact: @{self.handle}\n" \
-              f"Time: {self.time_slot}\n"\
-              f"Pax: {self.pax}\n"\
-              f"Remarks: {self.food_place}"
+        txt = f"[Session {self.id}]\n"\
+              f"\t\t\tName: {self.name}\n"\
+              f"\t\t\tContact: @{self.handle}\n" \
+              f"\t\t\tTime: {self.time_slot}\n"\
+              f"\t\t\tPax: {self.pax}\n"\
+              f"\t\t\tRemarks: {self.food_place}"
         return txt
 
 
@@ -31,7 +30,7 @@ class ChannelEntry:
         txt = f"<b>{self.day}</b>\n"
         for event in self.events:
             txt += str(event)
-            txt += "\n"
+            txt += "\n\n"
         return txt
 
     def sort_events(self):
@@ -56,5 +55,4 @@ class ChannelEntry:
                 idx = i
                 break
         del self.events[idx]
-        print(self.events)
         return True
