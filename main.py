@@ -417,6 +417,22 @@ def help(update: Update, context: CallbackContext) -> None:
 
     return MENU
 
+def themes(update: Update, context: CallbackContext) -> None:
+    """Show new choice of buttons"""
+    query = update.callback_query
+    query.answer()
+    keyboard = [
+        [InlineKeyboardButton("📃Main Menu", callback_data="main")],
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    query.edit_message_text(
+        text=f"*{random_theme_generator()}*",
+        parse_mode="Markdown",
+        reply_markup=reply_markup
+    )
+
+    return MENU
+
 
 def main():
     # Create the Updater and pass it your bot's token.
@@ -439,6 +455,7 @@ def main():
                 CallbackQueryHandler(days, pattern='^create$'),
                 CallbackQueryHandler(join, pattern='^join$'),
                 CallbackQueryHandler(delete, pattern='^delete$'),
+                CallbackQueryHandler(themes, pattern='^themes$'),
                 CallbackQueryHandler(help, pattern='^help$'),
             ],
             DELETE: [
