@@ -21,9 +21,9 @@ COUNT = 0
 CHANNEL = []
 MESSAGES = []
 
-CHANNEL_HANDLE = "@test_channel1233"
-CHANNEL_URL = "https://t.me/test_channel1233"
-BOT_TOKEN = "<INSERT TOKEN HERE>"
+CHANNEL_HANDLE = "@fodisnumberone"
+CHANNEL_URL = "https://t.me/fodisnumberone"
+BOT_TOKEN = "1414408039:AAFF_XI0DM1gINiPWcoBkxQnhQGteL-vomM"
 
 # Stages of conversation
 MENU, OPTIONS, DELETE, DAYS, TIME, PAX, REMARKS, CONFIRM, END, RESTART = range(10)
@@ -161,6 +161,7 @@ def menu(update: Update, context: CallbackContext) -> int:
         [InlineKeyboardButton("✍ Create Meal Session", callback_data="create")],
         [InlineKeyboardButton("🤝Join Meal Session", callback_data="join")],
         [InlineKeyboardButton("❌Delete Session", callback_data="delete")],
+        [InlineKeyboardButton("Themes", callback_data="themes")],
         [InlineKeyboardButton("🙋‍♂️🙋Help", callback_data="help")],
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -406,6 +407,24 @@ def help(update: Update, context: CallbackContext) -> None:
 
     return MENU
 
+###CONVO STARTER###
+
+def themes(update: Update, context: CallbackContext) -> None:
+    """Show new choice of buttons"""
+    query = update.callback_query
+    query.answer()
+    keyboard = [
+        [InlineKeyboardButton("📃Main Menu", callback_data="main")],
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    query.edit_message_text(
+        text=f"*{random_theme_generator()}*",
+        parse_mode="Markdown",
+        reply_markup=reply_markup
+    )
+
+    return MENU
+
 
 def main():
     # Create the Updater and pass it your bot's token.
@@ -428,6 +447,7 @@ def main():
                 CallbackQueryHandler(days, pattern='^create$'),
                 CallbackQueryHandler(join, pattern='^join$'),
                 CallbackQueryHandler(delete, pattern='^delete$'),
+                CallbackQueryHandler(themes, pattern='^themes$'),
                 CallbackQueryHandler(help, pattern='^help$'),
             ],
             DELETE: [
