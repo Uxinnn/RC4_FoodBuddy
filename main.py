@@ -3,6 +3,7 @@ import logging
 from typing import Dict, List, Union
 import datetime
 import pytz
+import random
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update, ParseMode
 from telegram.ext import (Updater, CommandHandler, CallbackQueryHandler, ConversationHandler, CallbackContext,
                           MessageHandler, Filters)
@@ -16,6 +17,10 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 DAY_DICT = {"Monday": 0, "Tuesday": 1, "Wednesday": 2, "Thursday": 3, "Friday": 4, "Saturday": 5, "Sunday": 6}
+
+THEMES_SET = ("Games", "Movies", "TV Shows", "Books", "Hobbies",
+             "Current Affairs", "Politics", "Music", "Sports",
+             "Academics", "Food", "Travel", "Animals", "Tech")
 
 COUNT = 0
 CHANNEL = []
@@ -128,6 +133,12 @@ def print_channel() -> None:
     for day in CHANNEL:
         txt += (str(day) + "\n")
     logger.debug(txt)
+
+# Generates a string describing the theme of the week
+def random_theme_generator():
+    theme = random.choice(THEMES_SET)
+    theme_string = f"Theme of the week: {theme}"
+    return theme_string
 
 
 #######
