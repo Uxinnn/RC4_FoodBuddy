@@ -19,8 +19,8 @@ logger.setLevel(logging.DEBUG)
 DAY_DICT = {"Monday": 0, "Tuesday": 1, "Wednesday": 2, "Thursday": 3, "Friday": 4, "Saturday": 5, "Sunday": 6}
 
 THEMES_SET = ("Games", "Movies", "TV Shows", "Books", "Hobbies",
-             "Current Affairs", "Politics", "Music", "Sports",
-             "Academics", "Food", "Travel", "Animals", "Tech")
+              "Current Affairs", "Politics", "Music", "Sports",
+              "Academics", "Food", "Travel", "Animals", "Tech")
 
 COUNT = 0
 CHANNEL = []
@@ -133,6 +133,7 @@ def print_channel() -> None:
     for day in CHANNEL:
         txt += (str(day) + "\n")
     logger.debug(txt)
+
 
 # Generates a string describing the theme of the week
 def random_theme_generator():
@@ -417,6 +418,7 @@ def help(update: Update, context: CallbackContext) -> None:
 
     return MENU
 
+
 def themes(update: Update, context: CallbackContext) -> None:
     """Show new choice of buttons"""
     query = update.callback_query
@@ -435,7 +437,7 @@ def themes(update: Update, context: CallbackContext) -> None:
 
 
 def main():
-    # Create the Updater and pass it your bot's token.
+    # Create the Updater and pass it your bot token.
     updater = Updater(BOT_TOKEN, use_context=True)
     init_channel(updater)
 

@@ -7,32 +7,32 @@ RC4_FoodBuddy
       /  __/ /  / /  /  / /  /  / /   /  /_/  /  /  /  /  / /   /  / /   /\  \/  /
      /  /   /  /_/  /  /_/  /  /_/   /  /__\  \  \_/  /  /_/   /  /_/   /  \    /
     /__/    \______/\______/\_______/_________/\_____/ \______/ \______/   /___/
- 
- Work distribution:
- * Frontend Input: Alvin
- * Frontend Output: Xin Yu
- * Backend: Bryan, Mukund
- 
-To clone repo:
-`git clone https://github.com/Uxinnn/RC4_FoodBuddy.git`
 
-Git Workflow:
-* `main` and `dev` are permanent branches. New branches should be created for new features.
-* **Github**: Create new branch to work on
-  * `<code><ID>_<task>`
-    * Channel: CH
-    * Bot: BT
-    * Processor: PC
-  * Eg. CH00_create_channel
-*  **Local**: `git pull`
-* **Local**: `git checkout <branch>`
-* **Local**: Ensure correct branch is selected using `git branch`
-* **Local**: Code
-* **Local**: `git add <new files/directories`
-* **Local**: `git commit -m "<message>"`
-* **Local**: `git push origin <branch>`
-* **Local**: Submit pull request
-* **Local**: Pull request to be merged into `dev` branch after vetting
-* **Local**: Delete local branch using `git branch -d <branch>`
-* **Local**: Remove tracking of deleted remote branch using `git remote prune origin`
-`dev` will be merged periodically into `main` for new version releases.
+## Getting Started:
+
+### Prerequisites
+* A valid telegram bot and bot token.
+* A telegram channel, with the bot having administrator privileges.
+* Python and pip installed.
+
+**Step 1:**
+
+Download or clone this repository.
+
+**Step 2:**
+
+Go to project root and run `pip install -r requirements.txt` to get required python libraries.
+
+**Step 3:**
+
+Go to main.py and replace CHANNEL_HANDLE, CHANNEL_URL, BOT_TOKEN with appropriate values.
+
+**Step 4:**
+
+Run the project using `python main.py`.
+
+
+
+## Contributors:
+ * Frontend: [Albunist](https://github.com/Albunist), [Uxinnn](https://github.com/Uxinnn)
+ * Backend: [bryanwhl](https://github.com/bryanwhl), Mukund
