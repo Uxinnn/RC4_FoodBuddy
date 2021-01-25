@@ -1,4 +1,4 @@
-RC4_FoodBuddy
+RC4 Food Buddy
 ===============
 *Fight isolation with food!*
 
