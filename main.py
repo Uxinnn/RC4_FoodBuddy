@@ -19,16 +19,16 @@ logger.setLevel(logging.DEBUG)
 DAY_DICT = {"Monday": 0, "Tuesday": 1, "Wednesday": 2, "Thursday": 3, "Friday": 4, "Saturday": 5, "Sunday": 6}
 
 THEMES_SET = ("Games", "Movies", "TV Shows", "Books", "Hobbies",
-              "Current Affairs", "Politics", "Music", "Sports",
-              "Academics", "Food", "Travel", "Animals", "Tech")
+             "Current Affairs", "Politics", "Music", "Sports",
+             "Academics", "Food", "Travel", "Animals", "Tech")
 
 COUNT = 0
 CHANNEL = []
 MESSAGES = []
 
-CHANNEL_HANDLE = "@test_channel1233"
-CHANNEL_URL = "https://t.me/test_channel1233"
-BOT_TOKEN = "<INSERT TOKEN HERE>"
+CHANNEL_HANDLE = "@fodisnumberone"
+CHANNEL_URL = "https://t.me/fodisnumberone"
+BOT_TOKEN = "1414408039:AAFF_XI0DM1gINiPWcoBkxQnhQGteL-vomM"
 
 # Stages of conversation
 MENU, OPTIONS, DELETE, DAYS, TIME, PAX, REMARKS, CONFIRM, END, RESTART = range(10)
@@ -134,11 +134,10 @@ def print_channel() -> None:
         txt += (str(day) + "\n")
     logger.debug(txt)
 
-
 # Generates a string describing the theme of the week
 def random_theme_generator():
     theme = random.choice(THEMES_SET)
-    theme_string = f"Theme of the week: {theme}"
+    theme_string = f"Random Theme: {theme}"
     return theme_string
 
 
@@ -173,6 +172,7 @@ def menu(update: Update, context: CallbackContext) -> int:
         [InlineKeyboardButton("✍ Create Meal Session", callback_data="create")],
         [InlineKeyboardButton("🤝Join Meal Session", callback_data="join")],
         [InlineKeyboardButton("❌Delete Session", callback_data="delete")],
+        [InlineKeyboardButton("🗣Themes", callback_data="themes")],
         [InlineKeyboardButton("🙋‍♂️🙋Help", callback_data="help")],
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -239,6 +239,11 @@ def time(update: Update, context: CallbackContext) -> int:
 
 
 # User to select maximum numer of pax after inputing time
+if update.effective_message.text.is_integer():
+
+
+else:
+    helpp
 def pax(update: Update, context: CallbackContext) -> int:
     text = update.effective_message.text
     context.user_data['Time'] = text
@@ -418,7 +423,6 @@ def help(update: Update, context: CallbackContext) -> None:
 
     return MENU
 
-
 def themes(update: Update, context: CallbackContext) -> None:
     """Show new choice of buttons"""
     query = update.callback_query
@@ -428,7 +432,7 @@ def themes(update: Update, context: CallbackContext) -> None:
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     query.edit_message_text(
-        text=f"*{random_theme_generator()}*",
+        text=f"*{random_theme_generator()}*\nLet's talk about this topic!",
         parse_mode="Markdown",
         reply_markup=reply_markup
     )
@@ -437,7 +441,7 @@ def themes(update: Update, context: CallbackContext) -> None:
 
 
 def main():
-    # Create the Updater and pass it your bot token.
+    # Create the Updater and pass it your bot's token.
     updater = Updater(BOT_TOKEN, use_context=True)
     init_channel(updater)
 
