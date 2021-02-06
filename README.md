@@ -1,4 +1,4 @@
-RC4_FoodBuddy
+RC4 Food Buddy
 ===============
 *Fight isolation with food!*
 
@@ -35,4 +35,4 @@ Run the project using `python main.py`.
 
 ## Contributors:
  * Frontend: [Albunist](https://github.com/Albunist), [Uxinnn](https://github.com/Uxinnn)
- * Backend: [bryanwhl](https://github.com/bryanwhl), Mukund
+ * Backend: [bryanwhl](https://github.com/bryanwhl), [mukundrs](https://github.com/mukundrs)
