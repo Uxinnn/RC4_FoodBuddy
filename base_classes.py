@@ -3,9 +3,9 @@ from datetime import datetime
 
 
 class Event:
-    def __init__(self, id: int, name: str, handle: str, dt: datetime, pax: str, food_place: str) -> None:
+    def __init__(self, id: int, description: str, handle: str, dt: datetime, pax: str, food_place: str) -> None:
         self.id = id  # id of event
-        self.name = name # name of the user
+        self.description = description # name of the user
         self.handle = handle  # handle of organizer
         self.dt = dt
         # self.day = day  # day of event (mon/tues/wed etc)
@@ -15,11 +15,11 @@ class Event:
 
     def __str__(self) -> str:
         txt = f"[Session {self.id}]\n"\
-              f"\t\t\tName: {self.name}\n"\
+              f"\t\t\tDescription: {self.description}\n"\
               f"\t\t\tContact: @{self.handle}\n" \
               f"\t\t\tTime: {self.dt.strftime('%H%M')}\n"\
               f"\t\t\tPax: {self.pax}\n"\
-              f"\t\t\tRemarks: {self.food_place}"
+              f"\t\t\tLocation: {self.food_place}"
         return txt
 
 
