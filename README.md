@@ -14,14 +14,12 @@ RC4FoodBuddy is a telegram bot that allows you to find a buddy within RC4 to hav
 
 ## User Guide:
 
-#### Telegram Bot
-
-###### Commands:
+#### Commands:
 /start 
-	- Starts the bot and an introduction of the bot will be given.
+	- Starts the telegram bot and an introduction of the bot will be given.
 	- Click on the Main Menu button to start using the bot.
 
-###### Flow of event for creating a meal session:
+#### Flow of event for creating a meal session:
 
 1. From the Main Menu, click on the Create button
 <img src = "/images/ss1.png" alt="Screenshot after clicking on the Create Button">
@@ -31,7 +29,6 @@ RC4FoodBuddy is a telegram bot that allows you to find a buddy within RC4 to hav
 <img src = "/images/ss3.png" alt="Screenshot of the channel after meal session is registered">
 4. Wait for your fellow RC4 peers to join your meal session!
 
-#### Telegram Channel
 
 
 
