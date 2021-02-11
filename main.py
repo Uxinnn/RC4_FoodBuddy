@@ -24,9 +24,9 @@ COUNT = 0
 CHANNEL = []
 MESSAGES = []
 
-CHANNEL_HANDLE = "CHANNEL_HANDLE"
-CHANNEL_URL = "CHANNEL_URL"
-BOT_TOKEN = "BOT_TOKEN"
+CHANNEL_HANDLE = "@fodisnumberone"
+CHANNEL_URL = "https://t.me/fodisnumberone"
+BOT_TOKEN = "1414408039:AAFF_XI0DM1gINiPWcoBkxQnhQGteL-vomM"
 
 # Stages of conversation
 MENU, OPTIONS, DELETE, RET_DEL, DAYS, TIME, RET_TIME, PAX, REMARKS, CONFIRM, END, RESTART = range(12)
@@ -146,44 +146,77 @@ def random_theme_generator():
 # First function when users types in /start & logs users' telegram handle
 def start(update: Update, context: CallbackContext) -> None:
     keyboard = [
-        [InlineKeyboardButton("Yes! Lets Go!", callback_data="main")],
+        [InlineKeyboardButton("Main Menu🍱", callback_data="main")],
         ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     user = update.message.from_user
-    context.user_data["Name"] = user.full_name
+    #context.user_data["Name"] = user.full_name
     context.user_data["Telegram Handle"] = user.username  # Changed from first and last name to username
     logger.info(f"User {user.first_name} started the conversation.")
 
-    update.message.reply_text(text="Looking for meal buddies?🙆‍♂️🙆‍♀️",
-                              parse_mode='Markdown',
-                              reply_markup=reply_markup
-                              )
+    update.message.reply_text(
+        text="*Welcome to RC4FoodBud!*\n\n"
+             "Want to jio friends, IG mates for lunch or dinner🥘?\n"
+             "Want to join others to grab a quick meal🥡?\n"
+             "RC4FoodBud is here to help!💪\n"
+             "Through this bot, you can create meal sessions to jio others 📣 or you can find others jioing you 🤪 via our channel!\n\n\n"
+             "An OrcaTech Initiative 🐳 by @Uxinnn,@mukundrs,@bryanwhl and @Albunist",
+            parse_mode='Markdown',
+            reply_markup=reply_markup
+            )
     return MENU
 
 
 def menu(update: Update, context: CallbackContext) -> int:
     """Send message on `/start`."""
-    query = update.callback_query
-    query.answer()
-    keyboard = [
-        [InlineKeyboardButton("✍ Create Meal Session", callback_data="create")],
-        [InlineKeyboardButton("🤝Join Meal Session", callback_data="join")],
-        [InlineKeyboardButton("❌Delete Session", callback_data="delete")],
-        [InlineKeyboardButton("🙋‍♂️🙋Help", callback_data="help")],
-    ]
+    if get_user_events(context.user_data["Telegram Handle"]):
+        query = update.callback_query
+        query.answer()
+        keyboard = [
+        [InlineKeyboardButton("Create🍳", callback_data="create")],
+        [InlineKeyboardButton("View Sessions🥂", url=CHANNEL_URL)],
+        [InlineKeyboardButton("Delete❌", callback_data="delete")],
+        [InlineKeyboardButton("Help🙋‍♂️🙋", callback_data="help")],
+        ]
+
+        reply_markup = InlineKeyboardMarkup(keyboard)
+
+        query.edit_message_text(
+            text="*Main Menu*\n\n"
+                 "Select _Create🍳_ to host a new meal session by adding more details\n\n"
+                 "Select _View Sessions🥂_ to join active meal sessions!\n\n"
+                 "Select _Delete❌_ to delete an existing session\n\n"
+                 "Select _Help🙋‍♂️🙋_ if you need further assistance or wish to contact the developers.",
+            parse_mode="Markdown",
+            reply_markup=reply_markup
+            )
+        return OPTIONS
 
     # Remove delete button if no sessions have been created by the user
-    if not get_user_events(context.user_data["Telegram Handle"]):
-        del keyboard[2]
+    elif not get_user_events(context.user_data["Telegram Handle"]):
+        query = update.callback_query
+        query.answer()
+        keyboard = [
+        [InlineKeyboardButton("Create🍳", callback_data="create")],
+        [InlineKeyboardButton("View Sessions🥂", url=CHANNEL_URL)],
+        [InlineKeyboardButton("Help🙋‍♂️🙋", callback_data="help")],
+        ]
 
-    reply_markup = InlineKeyboardMarkup(keyboard)
+        reply_markup = InlineKeyboardMarkup(keyboard)
 
-    query.edit_message_text(text="What do you want to do 🤔 ?",
-                            parse_mode="Markdown",
-                            reply_markup=reply_markup
-                            )
-    return OPTIONS
+        query.edit_message_text(
+            text="*Main Menu*\n\n"
+                 "Select _Create🍳_ to host a new meal session by adding more details\n\n"
+                 "Select _View Sessions🥂_ to join active meal sessions!\n"
+                 "To join, you need to PM the host listed in the channel\n\n"
+                 "Select _Help🙋‍♂️🙋_ if you need further assistance or wish to contact the developers.",
+            parse_mode="Markdown",
+            reply_markup=reply_markup
+            )
+        return OPTIONS
+
+   
 
 
 # Allows logged user_data to be printed as string
@@ -203,21 +236,42 @@ def facts_to_str(user_data: Dict[str, Union[str, datetime.datetime]]) -> str:
 # CREATE SESSION SEQUENCE #
 ###########################
 
-# User to pick the day for the session
-def days(update: Update, context: CallbackContext) -> int:
-    """Show new choice of buttons"""
+# User to name session
+def description(update: Update, context: CallbackContext) -> int:
     query = update.callback_query
     query.answer()
+    keyboard = [
+        [InlineKeyboardButton("Main Menu🍱", callback_data="main")]
+        
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    query.edit_message_text(
+        text="*Session Description*\n\n"
+             "Please put a brief description✍ of your session.\n"
+             "Example:_OrcaTech Bonding👋_",
+        parse_mode="Markdown",
+        reply_markup=reply_markup
+        )
+    return DAYS
+
+# User to pick the day for the session
+def days(update: Update, context: CallbackContext) -> int:
+    text = update.effective_message.text
+    context.user_data['Description'] = text
+    logger.debug(f"\t{context.user_data['Telegram Handle']} remarked {text}")
     dates = [datetime.date.today() + datetime.timedelta(days=i) for i in range(7)]
     keyboard = [
         [InlineKeyboardButton(dates[i].strftime("%d/%m"), callback_data=str(i)) for i in range(len(dates))],
-        [InlineKeyboardButton("📃Main Menu", callback_data="main")]
+        [InlineKeyboardButton("Back🔙", callback_data="back")],
+        [InlineKeyboardButton("Main Menu🍱", callback_data="main")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    query.edit_message_text(text="Please choose a day in the current academic week 📅:",
-                            parse_mode="Markdown",
-                            reply_markup=reply_markup
-                            )
+    update.effective_message.reply_text(
+        text="*Session Date*\n\n"
+             "Please choose a day in the current academic week 📅.",
+        parse_mode="Markdown",
+        reply_markup=reply_markup
+        )
     return TIME
 
 
@@ -225,36 +279,35 @@ def days(update: Update, context: CallbackContext) -> int:
 def time(update: Update, context: CallbackContext) -> int:
     query = update.callback_query
     query.answer()
-    if query.data != "back":
+    if query.data != "back": #At any point the user presses back, this is called  
         context.user_data['dt'] = datetime.datetime.today().replace(hour=0, minute=0, second=0, microsecond=0) + datetime.timedelta(days=int(query.data))
         logger.debug(f"\t{context.user_data['Telegram Handle']} chose {query.data}")
-    keyboard = [
-        [InlineKeyboardButton("📃Main Menu", callback_data="main")],
-        [InlineKeyboardButton("🔙Back", callback_data="back")],
+    keyboard = [ 
+        [InlineKeyboardButton("Back🔙", callback_data="back")],
+        [InlineKeyboardButton("Main Menu🍱", callback_data="main")],
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    query.edit_message_text(text="Please indicate the time 🕔 of the meal, following this format: 1500",
-                            parse_mode="Markdown",
-                            reply_markup=reply_markup
-                            )
+    query.edit_message_text(
+        text="*Session Time*\n\n"
+             "Please indicate the time 🕔 of the meal in the 24hr format.\n"
+             "_Example:1500_",
+        parse_mode="Markdown",
+        reply_markup=reply_markup
+        )
     return PAX
 
 
 # User to select maximum numer of pax after inputing time
 def pax(update: Update, context: CallbackContext) -> int:
+    query = update.callback_query#
     text = update.effective_message.text
     is_bot = update.effective_message.from_user["is_bot"]
 
     # Display error if most recent message is created by a user and has an invalid format
     if (len(text) != 4 or not text.isnumeric() or int(text[2:]) > 60 or int(text) < 0 or int(text) > 2359) and not is_bot:
-        keyboard = [
-            [InlineKeyboardButton("🔙Back", callback_data="back")],
-        ]
-        reply_markup = InlineKeyboardMarkup(keyboard)
         update.effective_message.reply_text(
-            text="*ERROR*: Invalid input time format. Please follow 24hr format.\n\tE.g. 2359",
-            parse_mode='Markdown',
-            reply_markup=reply_markup
+            text="Sorry, a valid time was not registered. Please send us the time in 24hr format.\n_Example:2359_",
+            parse_mode='Markdown'
         )
         return RET_TIME
 
@@ -270,48 +323,57 @@ def pax(update: Update, context: CallbackContext) -> int:
          InlineKeyboardButton("5", callback_data="5"),
          InlineKeyboardButton("6", callback_data="6"),
          InlineKeyboardButton("7", callback_data="7")],
-        [InlineKeyboardButton("🔙Back", callback_data="back")],
-        [InlineKeyboardButton("📃Main Menu", callback_data="main")],
+        [InlineKeyboardButton("Back🔙", callback_data="back")],
+        [InlineKeyboardButton("Main Menu🍱", callback_data="main")],
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    update.effective_message.reply_text(text="Choose the max number 🔢 of people (excluding yourself) for the meal.",
-                                        parse_mode="Markdown",
-                                        reply_markup=reply_markup
-                                        )
+    update.effective_message.reply_text(
+        text="*Session Pax*\n\n"
+             "Choose the max number 🔢 of people (excluding yourself) for the meal.",
+        parse_mode="Markdown",
+        reply_markup=reply_markup
+        )
     return REMARKS
 
 
+
+
+
+
 # User to input other remarks after selecting max number of pax
-def remarks(update: Update, context: CallbackContext) -> int:
+def location(update: Update, context: CallbackContext) -> int:
     query = update.callback_query
     query.answer()
     context.user_data['Pax'] = query.data
     keyboard = [
-        [InlineKeyboardButton("🔙Back", callback_data="back")],
-        [InlineKeyboardButton("📃Main Menu", callback_data="main")],
+        [InlineKeyboardButton("Back🔙", callback_data="back")],
+        [InlineKeyboardButton("Main Menu🍱", callback_data="main")],
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    query.edit_message_text(text="Please indicate the location 🧭 of the meal and other preferences.",
-                            parse_mode="Markdown",
-                            reply_markup=reply_markup
-                            )
+    query.edit_message_text(
+        text="*Session Location*\n\n"
+             "Please indicate the location 🧭 of the meal.\n"
+             "_Example:Fine Food_",
+        parse_mode="Markdown",
+        reply_markup=reply_markup
+        )
     return CONFIRM
 
 
 # User to confirm session details before the bot sends to channel
 def confirm(update: Update, context: CallbackContext) -> None:
     text = update.effective_message.text
-    context.user_data['Remarks'] = text
+    context.user_data['Location'] = text
     logger.debug(f"\t{context.user_data['Telegram Handle']} remarked {text}")
 
     keyboard = [
-        [InlineKeyboardButton("✔Confirm", callback_data="confirm")],
-        [InlineKeyboardButton("📃Main Menu", callback_data="main")],
-        [InlineKeyboardButton("🔙Back", callback_data="back")],
+        [InlineKeyboardButton("Confirm✔", callback_data="confirm")],
+        [InlineKeyboardButton("Back🔙", callback_data="back")],
+        [InlineKeyboardButton("Main Menu🍱", callback_data="main")],
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    update.effective_message.reply_text(f"Please confirm your session details:{facts_to_str(context.user_data)}",
+    update.effective_message.reply_text(f"*Session Confirmation*\n\nPlease confirm your session details:{facts_to_str(context.user_data)}",
                                         parse_mode="Markdown",
                                         reply_markup=reply_markup
                                         )
@@ -327,45 +389,31 @@ def end(update: Update, context: CallbackContext) -> int:
 
     # Add event to CHANNEL
     event = Event(COUNT,
-                  context.user_data["Name"],
+                  context.user_data["Description"],
                   context.user_data["Telegram Handle"],
                   context.user_data["dt"],
                   context.user_data["Pax"],
-                  context.user_data["Remarks"])
+                  context.user_data["Location"])
     add_to_channel(event, context)
     COUNT += 1
 
     keyboard = [
-            [InlineKeyboardButton("📃Main Menu", callback_data="main")],
+            [InlineKeyboardButton("Main Menu🍱", callback_data="main")],
+            [InlineKeyboardButton("View Session🔍", url=CHANNEL_URL)]
         ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    query.edit_message_text("Session created successfully! Thank you for hosting a session!😊",
-                            parse_mode="Markdown",
-                            reply_markup=reply_markup
-                            )
+    query.edit_message_text(
+         "*Session created successfully!*\n\n"
+         "Select _Main Menu🍱_ to return to the menu\n"
+         "Select _View Session🔍_ to view your session!",
+        parse_mode="Markdown",
+        reply_markup=reply_markup
+        )
     return RESTART
 
 
-############################
-# JOINING SESSION SEQUENCE #
-############################
 
-def join(update: Update, context: CallbackContext) -> int:
-    """Show new choice of buttons"""
-    query = update.callback_query
-    query.answer()
-    logger.debug(f"\t{context.user_data['Telegram Handle']} wants to join a session")
-    keyboard = [
-        [InlineKeyboardButton("🧐Browse active sessions", url=CHANNEL_URL)],
-        [InlineKeyboardButton("📃Main Menu", callback_data="main")],
-    ]
-    reply_markup = InlineKeyboardMarkup(keyboard)
-    query.edit_message_text(text="Search🔍 for available sessions!",
-                            parse_mode="Markdown",
-                            reply_markup=reply_markup
-                            )
-    return MENU
 
 
 #############################
@@ -382,7 +430,7 @@ def delete(update: Update, context: CallbackContext) -> None:
         event_str += (str(event) + "\n\n")
 
     keyboard = [
-        [InlineKeyboardButton("🔙Back", callback_data="back")]
+        [InlineKeyboardButton("Back🔙", callback_data="back")]
     ]
 
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -397,9 +445,10 @@ def delete(update: Update, context: CallbackContext) -> None:
         return DELETE
 
     query.edit_message_text(
-        text=f"Which of the following sessions do you want to delete?\n"
+        text=f"These are your sessions:\n"
              f"{event_str}\n"
-             f"Please input the session id, E.g: 2",
+             f"Please select a session to delete by typing the session id.\n"
+             f"For example, you want to delete [Session 7] so type:_7_ ",
         parse_mode='Markdown',
         reply_markup=reply_markup
     )
@@ -419,13 +468,14 @@ def clear(update: Update, context: CallbackContext) -> None:
             event_str += (str(event) + "\n\n")
 
         keyboard = [
-            [InlineKeyboardButton("🔙Back", callback_data="back")],
+            [InlineKeyboardButton("Back🔙", callback_data="back")],
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
         update.effective_message.reply_text(
-            text=f"*ERROR*: Invalid input ID.\n"
+            text=f"Sorry, a valid session id was not registered\n"
                  f"{event_str}\n"
-                 f"Please input the session id, E.g: 2",
+                 f"Please send us a session id from the list above\n"
+                 f"For example, you want to delete [Session 7] so type:_7_ ",
             parse_mode='Markdown',
             reply_markup=reply_markup
         )
@@ -435,7 +485,7 @@ def clear(update: Update, context: CallbackContext) -> None:
     del_from_channel(id, context)
 
     keyboard = [
-        [InlineKeyboardButton("📃Main Menu", callback_data="main")],
+        [InlineKeyboardButton("Main Menu🍱", callback_data="main")],
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     update.effective_message.reply_text(
@@ -453,14 +503,17 @@ def help(update: Update, context: CallbackContext) -> None:
     query = update.callback_query
     query.answer()
     keyboard = [
-        [InlineKeyboardButton("📃Main Menu", callback_data="main")],
+        [InlineKeyboardButton("Main Menu🍱", callback_data="main")],
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     query.edit_message_text(
-        text="*To find an existing session:*\n\t\t"
-             "Click on join meal session at the main menu.\n"
-             "*To create a new session:*\n\t\t"
-             "Click on create meal session at the main menu and input the necessary details accordingly.",
+        text="*Help*\n\n"
+             "This bot assists in creating meal sessions and publish the details to the telegram channel\n"
+             "To create a meal session, you will need to input 5 details: Description✍, Date📅, Time🕔, Pax🔢 and Location🧭 of the meal\n"
+             "You can start by selecting _Create🍳_ and the bot will guide you along the way to input the 5 required details\n"
+             "To view a meal session, you can just proceed to the telegram channel:https://t.me/fodisnumberone\n"
+             "In order to join a meal session, you would need to access the telegram channel and contact the host of the listed session you want to join\n\n"
+             "Contact @Uxinnn,@mukundrs,@bryanwhl or @Albunist if you need further assistance",
         parse_mode="Markdown",
         reply_markup=reply_markup
     )
@@ -473,7 +526,7 @@ def themes(update: Update, context: CallbackContext) -> None:
     query = update.callback_query
     query.answer()
     keyboard = [
-        [InlineKeyboardButton("📃Main Menu", callback_data="main")],
+        [InlineKeyboardButton("Main Menu🍱", callback_data="main")],
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     query.edit_message_text(
@@ -503,8 +556,7 @@ def main():
                 CallbackQueryHandler(menu, pattern='^main$'),
             ],
             OPTIONS: [
-                CallbackQueryHandler(days, pattern='^create$'),
-                CallbackQueryHandler(join, pattern='^join$'),
+                CallbackQueryHandler(description, pattern='^create$'),
                 CallbackQueryHandler(delete, pattern='^delete$'),
                 CallbackQueryHandler(themes, pattern='^themes$'),
                 CallbackQueryHandler(help, pattern='^help$'),
@@ -517,6 +569,10 @@ def main():
                 MessageHandler(Filters.text & ~Filters.command, clear),
                 CallbackQueryHandler(delete, pattern='^back$')
             ],
+            DAYS: [
+                MessageHandler(Filters.text & ~Filters.command, days),
+                CallbackQueryHandler(menu, pattern='^main$'),
+            ],
             TIME: [
                 CallbackQueryHandler(time, pattern='^0$'),
                 CallbackQueryHandler(time, pattern='^1$'),
@@ -525,6 +581,7 @@ def main():
                 CallbackQueryHandler(time, pattern='^4$'),
                 CallbackQueryHandler(time, pattern='^5$'),
                 CallbackQueryHandler(time, pattern='^6$'),
+                CallbackQueryHandler(description, pattern='^back$'),
                 CallbackQueryHandler(menu, pattern='^main$')
             ],
             RET_TIME: [
@@ -537,12 +594,12 @@ def main():
                 CallbackQueryHandler(menu, pattern='^main$')
             ],
             REMARKS: [
-                CallbackQueryHandler(remarks, pattern='^2$'),
-                CallbackQueryHandler(remarks, pattern='^3$'),
-                CallbackQueryHandler(remarks, pattern='^4$'),
-                CallbackQueryHandler(remarks, pattern='^5$'),
-                CallbackQueryHandler(remarks, pattern='^6$'),
-                CallbackQueryHandler(remarks, pattern='^7$'),
+                CallbackQueryHandler(location, pattern='^2$'),
+                CallbackQueryHandler(location, pattern='^3$'),
+                CallbackQueryHandler(location, pattern='^4$'),
+                CallbackQueryHandler(location, pattern='^5$'),
+                CallbackQueryHandler(location, pattern='^6$'),
+                CallbackQueryHandler(location, pattern='^7$'),
                 CallbackQueryHandler(time, pattern='^back$'),
                 CallbackQueryHandler(menu, pattern='^main$'),
             ],
@@ -553,7 +610,7 @@ def main():
             ],
             END: [
                 CallbackQueryHandler(end, pattern='^confirm$'),
-                CallbackQueryHandler(remarks, pattern='^back$'),
+                CallbackQueryHandler(location, pattern='^back$'),
                 CallbackQueryHandler(menu, pattern='^main$'),
             ],
             RESTART: [
