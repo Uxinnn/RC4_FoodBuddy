@@ -23,9 +23,12 @@ RC4FoodBuddy is a telegram bot that allows you to find a buddy within RC4 to hav
 
 ###### Flow of event for creating a meal session:
 1. From the Main Menu, click on the Create
-<img src = "/images/ss1">
+<img src = "/images/ss1.png">
 2. Follow the subsequent instructions given by the bot. Once created, your conversation with the bot should look like this:
-<img src = "/images/ss2">
+<img src = "/images/ss2.png">
+3. Click on "View meal session". You should be able to see your meal session entry on the telegram channel as shown below:
+<img src = "/images/ss3.png">
+4. Wait for your fellow RC4 peers to join your meal session!
 
 #### Telegram Channel
 
