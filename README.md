@@ -22,13 +22,19 @@ RC4FoodBuddy is a telegram bot that allows you to find a buddy within RC4 to hav
 #### Flow of event for creating a meal session:
 
 1. From the Main Menu, click on the Create button
-<img src = "/images/ss1.png" alt="Screenshot after clicking on the Create Button">
+<img src = "/images/ss1.png" title="Screenshot after clicking on the Create Button">
 2. Follow the subsequent instructions given by the bot. Once created, your conversation with the bot should look like this:
-<img src = "/images/ss2.png" alt="Screenshot of the conversation with the bot upon successful creation of meal session">
+<img src = "/images/ss2.png" title="Screenshot of the conversation with the bot upon successful creation of meal session">
 3. Click on "View meal session". You should be able to see your meal session entry on the telegram channel as shown below:
-<img src = "/images/ss3.png" alt="Screenshot of the channel after meal session is registered">
+<img src = "/images/ss3.png" title="Screenshot of the channel after meal session is registered">
 4. Wait for your fellow RC4 peers to join your meal session!
 
+#### Flow of event for deleting a meal session:
+
+1. From the Main Menu, click on the Delete button
+2. Your meal sessions will be listed in by the bot as shown below. Enter the session number that you want to delete.
+<img src = "/images/ss4.png" title="Screenshot after clicking on the Delete Button">
+3. Your meal session will now be deleted. Verify it in the telegram bot channel.
 
 
 
