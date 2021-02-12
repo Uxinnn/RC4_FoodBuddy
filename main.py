@@ -24,9 +24,9 @@ COUNT = 0
 CHANNEL = []
 MESSAGES = []
 
-CHANNEL_HANDLE = "@fodisnumberone"
-CHANNEL_URL = "https://t.me/fodisnumberone"
-BOT_TOKEN = "1414408039:AAFF_XI0DM1gINiPWcoBkxQnhQGteL-vomM"
+CHANNEL_HANDLE = "<INSERT CHANNEL HANDLE HERE>"
+CHANNEL_URL = "<INSERT CHANNEL URL HERE>"
+BOT_TOKEN = "<INSERT BOT TOKEN HERE>"
 
 # Stages of conversation
 MENU, OPTIONS, DELETE, RET_DEL, DAYS, TIME, RET_TIME, PAX, REMARKS, CONFIRM, END, RESTART = range(12)
@@ -151,8 +151,7 @@ def start(update: Update, context: CallbackContext) -> None:
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     user = update.message.from_user
-    #context.user_data["Name"] = user.full_name
-    context.user_data["Telegram Handle"] = user.username  # Changed from first and last name to username
+    context.user_data["Telegram Handle"] = user.username
     logger.info(f"User {user.first_name} started the conversation.")
 
     update.message.reply_text(
@@ -161,10 +160,10 @@ def start(update: Update, context: CallbackContext) -> None:
              "Want to join others to grab a quick meal🥡?\n"
              "RC4FoodBud is here to help!💪\n"
              "Through this bot, you can create meal sessions to jio others 📣 or you can find others jioing you 🤪 via our channel!\n\n\n"
-             "An OrcaTech Initiative 🐳 by @Uxinnn,@mukundrs,@bryanwhl and @Albunist",
-            parse_mode='Markdown',
-            reply_markup=reply_markup
-            )
+             "An OrcaTech Initiative 🐳 by @Uxinnn, @mukundrs, @bryanwhl and @Albunist",
+        parse_mode='Markdown',
+        reply_markup=reply_markup
+    )
     return MENU
 
 
@@ -216,8 +215,6 @@ def menu(update: Update, context: CallbackContext) -> int:
             )
         return OPTIONS
 
-   
-
 
 # Allows logged user_data to be printed as string
 def facts_to_str(user_data: Dict[str, Union[str, datetime.datetime]]) -> str:
@@ -254,6 +251,7 @@ def description(update: Update, context: CallbackContext) -> int:
         )
     return DAYS
 
+
 # User to pick the day for the session
 def days(update: Update, context: CallbackContext) -> int:
     text = update.effective_message.text
@@ -279,7 +277,7 @@ def days(update: Update, context: CallbackContext) -> int:
 def time(update: Update, context: CallbackContext) -> int:
     query = update.callback_query
     query.answer()
-    if query.data != "back": #At any point the user presses back, this is called  
+    if query.data != "back":  # At any point the user presses back, this is called
         context.user_data['dt'] = datetime.datetime.today().replace(hour=0, minute=0, second=0, microsecond=0) + datetime.timedelta(days=int(query.data))
         logger.debug(f"\t{context.user_data['Telegram Handle']} chose {query.data}")
     keyboard = [ 
@@ -299,7 +297,7 @@ def time(update: Update, context: CallbackContext) -> int:
 
 # User to select maximum numer of pax after inputing time
 def pax(update: Update, context: CallbackContext) -> int:
-    query = update.callback_query#
+    query = update.callback_query
     text = update.effective_message.text
     is_bot = update.effective_message.from_user["is_bot"]
 
@@ -313,7 +311,18 @@ def pax(update: Update, context: CallbackContext) -> int:
 
     # Update time in datetime object if most recent message is created by a user
     if not is_bot:
-        context.user_data['dt'] = context.user_data['dt'].replace(hour=int(text[:2]), minute=int(text[2:]))
+        context.user_data["dt"] = context.user_data["dt"].replace(hour=int(text[:2]), minute=int(text[2:]))
+        # Checks if datetime entered is in the past
+        if context.user_data["dt"] < datetime.datetime.now():
+            current_time = datetime.datetime.now()
+
+            update.effective_message.reply_text(
+                text="Sorry, the date and time entered has past. Please send us a valid time in 24hr format. "
+                     f"Current time is {current_time.strftime('%H%M')}."
+                     f"\n_Example:{(current_time + datetime.timedelta(minutes=5)).strftime('%H%M')}_",
+                parse_mode='Markdown'
+            )
+            return RET_TIME
         logger.debug(f"\t{context.user_data['Telegram Handle']} chose {text}")
 
     keyboard = [
@@ -336,15 +345,12 @@ def pax(update: Update, context: CallbackContext) -> int:
     return REMARKS
 
 
-
-
-
-
 # User to input other remarks after selecting max number of pax
 def location(update: Update, context: CallbackContext) -> int:
     query = update.callback_query
     query.answer()
-    context.user_data['Pax'] = query.data
+    if query.data.isnumeric():
+        context.user_data['Pax'] = int(query.data)
     keyboard = [
         [InlineKeyboardButton("Back🔙", callback_data="back")],
         [InlineKeyboardButton("Main Menu🍱", callback_data="main")],
@@ -403,17 +409,13 @@ def end(update: Update, context: CallbackContext) -> int:
         ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    query.edit_message_text(
-         "*Session created successfully!*\n\n"
-         "Select _Main Menu🍱_ to return to the menu\n"
-         "Select _View Session🔍_ to view your session!",
-        parse_mode="Markdown",
-        reply_markup=reply_markup
-        )
+    query.edit_message_text("*Session created successfully!*\n\n"
+                            "Select _Main Menu🍱_ to return to the menu\n"
+                            "Select _View Session🔍_ to view your session!",
+                            parse_mode="Markdown",
+                            reply_markup=reply_markup
+                            )
     return RESTART
-
-
-
 
 
 #############################
@@ -507,14 +509,14 @@ def help(update: Update, context: CallbackContext) -> None:
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     query.edit_message_text(
-        text="*Help*\n\n"
-             "This bot assists in creating meal sessions and publish the details to the telegram channel\n"
-             "To create a meal session, you will need to input 5 details: Description✍, Date📅, Time🕔, Pax🔢 and Location🧭 of the meal\n"
-             "You can start by selecting _Create🍳_ and the bot will guide you along the way to input the 5 required details\n"
-             "To view a meal session, you can just proceed to the telegram channel:https://t.me/fodisnumberone\n"
-             "In order to join a meal session, you would need to access the telegram channel and contact the host of the listed session you want to join\n\n"
-             "Contact @Uxinnn,@mukundrs,@bryanwhl or @Albunist if you need further assistance",
-        parse_mode="Markdown",
+        text="<b>Help</b>\n\n"
+             "This bot assists in creating meal sessions and publish the details to the telegram channel.\n"
+             "To create a meal session, you will need to input 5 details: Description✍, Date📅, Time🕔, Pax🔢 and Location🧭 of the meal.\n"
+             "You can start by selecting _Create🍳_ and the bot will guide you along the way to input the 5 required details.\n"
+             f"To view a meal session, you can just proceed to the telegram channel:{CHANNEL_URL}.\n"
+             "In order to join a meal session, you would need to access the telegram channel and contact the host of the listed session you want to join.\n\n"
+             "Contact @Uxinnn, @mukundrs, @bryanwhl or @Albunist if you need further assistance.",
+        parse_mode="HTML",  # Using HTML as channel url has _ which parses wrongly on markdown
         reply_markup=reply_markup
     )
 

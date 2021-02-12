@@ -3,9 +3,9 @@ from datetime import datetime
 
 
 class Event:
-    def __init__(self, id: int, description: str, handle: str, dt: datetime, pax: str, food_place: str) -> None:
+    def __init__(self, id: int, description: str, handle: str, dt: datetime, pax: int, food_place: str) -> None:
         self.id = id  # id of event
-        self.description = description # name of the user
+        self.description = description  # name of the user
         self.handle = handle  # handle of organizer
         self.dt = dt
         # self.day = day  # day of event (mon/tues/wed etc)
@@ -34,20 +34,20 @@ class ChannelEntry:
             txt += (str(event) + "\n\n")
         return txt
 
-    def sort_events(self):
+    def sort_events(self) -> None:
         self.events.sort(key=lambda event: event.dt)
 
-    def add_event(self, event):
+    def add_event(self, event) -> None:
         self.events.append(event)
         self.sort_events()
 
-    def get_user_events(self, user):
+    def get_user_events(self, user) -> list:
         return [event for event in self.events if event.handle == user]
 
-    def check_event_id(self, id):
+    def check_event_id(self, id) -> bool:
         return id in [event.id for event in self.events]
 
-    def del_event(self, id):
+    def del_event(self, id) -> bool:
         if not self.check_event_id(id):
             return False
         idx = 0
