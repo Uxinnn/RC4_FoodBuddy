@@ -32,7 +32,7 @@ BOT_TOKEN = "<INSERT BOT TOKEN HERE>"
 MENU, OPTIONS, DELETE, RET_DEL, DAYS, TIME, RET_TIME, PAX, REMARKS, CONFIRM, END, RESTART = range(12)
 
 TIME_ZONE = pytz.timezone("Asia/Singapore")
-DAILY_UPDATE_TIME = datetime.time(hour=0, minute=0, second=0, tzinfo=TIME_ZONE)
+DAILY_UPDATE_TIME = datetime.time(hour=8, minute=0, second=0, tzinfo=TIME_ZONE)
 
 
 ####################################
@@ -60,7 +60,7 @@ def update_channel(context: Union[CallbackContext, Updater]) -> None:
     logger.debug("Updating Channel...")
     for entry in CHANNEL:
         msg = MESSAGES[CHANNEL.index(entry)]
-        logger.debug(f"\t{entry.day} updating...")
+        logger.debug(f"\t{entry.date} updating...")
         # Will raise error if message is not different, FIND WAY TO RECTIFY!
         try:
             context.bot.edit_message_text(chat_id=msg.chat_id,
