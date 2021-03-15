@@ -10,7 +10,6 @@ from telegram.ext import (Updater, CommandHandler, CallbackQueryHandler, Convers
 from telegram.error import BadRequest
 from base_classes import Event, ChannelEntry
 
-
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -260,7 +259,8 @@ def description(update: Update, context: CallbackContext) -> int:
 # User to pick the day for the session
 def days(update: Update, context: CallbackContext) -> int:
     text = update.effective_message.text
-    context.user_data['Description'] = text
+    if text != "Session Time\n\nPlease indicate the time 🕔 of the meal in the 24hr format.\nExample:1500":
+        context.user_data['Description'] = text
     logger.debug(f"\t{context.user_data['Telegram Handle']} remarked {text}")
     dates = [datetime.date.today() + datetime.timedelta(days=i) for i in range(7)]
     keyboard = [

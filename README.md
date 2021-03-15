@@ -64,3 +64,8 @@ Run the project using `python main.py`.
 ## Contributors:
  * Frontend: [Albunist](https://github.com/Albunist), [Uxinnn](https://github.com/Uxinnn)
  * Backend: [bryanwhl](https://github.com/bryanwhl), [mukundrs](https://github.com/mukundrs)
+
+
+## Useful Links
+ * [Python Telegram Bot API](https://python-telegram-bot.readthedocs.io/en/stable/)
+ * [PEP 8 Style Guide](https://www.python.org/dev/peps/pep-0008/)
