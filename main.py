@@ -146,7 +146,7 @@ def random_theme_generator():
 # First function when users types in /start & logs users' telegram handle
 def start(update: Update, context: CallbackContext) -> None:
     keyboard = [
-        [InlineKeyboardButton("Main Menu🍱", callback_data="main")],
+        [InlineKeyboardButton("I agree 🍱", callback_data="main")],
         ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
@@ -160,6 +160,11 @@ def start(update: Update, context: CallbackContext) -> None:
              "Want to join others to grab a quick meal🥡?\n"
              "RC4FoodBud is here to help!💪\n"
              "Through this bot, you can create meal sessions to jio others 📣 or you can find others jioing you 🤪 via our channel!\n\n\n"
+             "*PDPA Consent*\n"
+             "By using this bot, you are givng consent for RC4FoodBud to collect, use, and disclose your data\n"
+             "for all purposes relating to pairing with other residents for meals.By indicating your consent to provide your\n"
+             "personal data in this, you agree to share your telegram handle to others for the process of pairing.\n"
+             "All personal information will be kept confidential and used for the purpose(s) stated\n\n\n"
              "An OrcaTech Initiative 🐳 by @Uxinnn, @mukundrs, @bryanwhl and @Albunist",
         parse_mode='Markdown',
         reply_markup=reply_markup
@@ -326,7 +331,8 @@ def pax(update: Update, context: CallbackContext) -> int:
         logger.debug(f"\t{context.user_data['Telegram Handle']} chose {text}")
 
     keyboard = [
-        [InlineKeyboardButton("2", callback_data="2"),
+        [InlineKeyboardButton("1", callback_data="1"),
+         InlineKeyboardButton("2", callback_data="2"),
          InlineKeyboardButton("3", callback_data="3"),
          InlineKeyboardButton("4", callback_data="4"),
          InlineKeyboardButton("5", callback_data="5"),
@@ -379,8 +385,8 @@ def confirm(update: Update, context: CallbackContext) -> None:
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    update.effective_message.reply_text(f"*Session Confirmation*\n\nPlease confirm your session details:{facts_to_str(context.user_data)}",
-                                        parse_mode="Markdown",
+    update.effective_message.reply_text(f"<b>Session Confirmation</b>\n\nPlease confirm your session details:{facts_to_str(context.user_data)}",
+                                        parse_mode="HTML",
                                         reply_markup=reply_markup
                                         )
     return END
@@ -487,7 +493,9 @@ def clear(update: Update, context: CallbackContext) -> None:
     del_from_channel(id, context)
 
     keyboard = [
+        [InlineKeyboardButton("View Sessions🥂", url=CHANNEL_URL)],
         [InlineKeyboardButton("Main Menu🍱", callback_data="main")],
+        
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     update.effective_message.reply_text(
@@ -596,6 +604,7 @@ def main():
                 CallbackQueryHandler(menu, pattern='^main$')
             ],
             REMARKS: [
+                CallbackQueryHandler(location, pattern='^1$'),
                 CallbackQueryHandler(location, pattern='^2$'),
                 CallbackQueryHandler(location, pattern='^3$'),
                 CallbackQueryHandler(location, pattern='^4$'),
